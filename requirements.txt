@@ -1,0 +1,8 @@
+Flask
+gevent
+gunicorn
+numpy
+Pillow
+opencv-python
+requests
+Werkzeug
