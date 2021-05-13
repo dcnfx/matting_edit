@@ -15,11 +15,6 @@ A pretty and customizable web app to deploy your DL model with ease
 - Go to http://localhost:5000
 - Done! :tada:
 
-:point_down: Screenshot:
-
-<p align="center">
-  <img src="https://cdn.dcnfx.com/img/2021/02/YdsAaT.jpg" height="420px" alt="">
-</p>
 
 ------------------
 
@@ -29,14 +24,14 @@ With **[Docker](https://www.docker.com)**, you can quickly build and run the ent
 
 ```shell
 # 1. First, clone the repo
-$ git clone https://github.com/dcnfx/face_detect_webapp.git
-$ cd face_detect_webapp
+$ git clone https://github.com/dcnfx/matting_edit.git
+$ cd matting_edit
 
 # 2. Build Docker image
-$ docker build -t face_detect_app .
+$ docker build -t matting_edit .
 
 # 3. Run!
-$ docker run -it --rm -p 5000:5000 face_detect_app
+$ docker run -it --rm -p 5000:5000 matting_edit
 ```
 
 Open http://localhost:5000 and wait till the webpage is loaded.
@@ -47,8 +42,8 @@ It's easy to install and run it on your computer.
 
 ```shell
 # 1. First, clone the repo
-$ git clone https://github.com/dcnfx/face_detect_webapp.git
-$ cd face_detect_webapp
+$ git clone https://github.com/dcnfx/matting_edit.git
+$ cd matting_edit
 
 # 2. Install Python packages
 $ pip install -r requirements.txt
