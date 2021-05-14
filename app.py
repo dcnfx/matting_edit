@@ -33,19 +33,28 @@ def fusion_bg():
             matting_edit_bg.generate(mask_path, img_path, save_path)
         except AttributeError:
             return jsonify(data= {"message": "Input pictures failure. "}, code=1)
+        except cv2.error as err:
+            print(err)
+            return jsonify(data= {"message": "cv2 failure. "}, code=1)
         except:
-            return jsonify(data= {"message": "Generate failure. "}, code=1)
+            return jsonify(data= {"message": "runtime failure. "}, code=1)
     if request.form["mode"] == "change":
-        bg_addr = request.form["bg_addr"]
-        scale = request.form["scale"]
-        position_x = request.form["position_x"]
-        position_y = request.form["position_y"]
+        bg_path = request.form["bg_path"]
+        scale = float(request.form["scale"])
+        position_x = int(request.form["position_x"])
+        position_y = int(request.form["position_y"])
+        # print(request.form)
+        # print(scale, position_x, position_y)
         try:
-            matting_edit_bg.generate(mask_path, img_path, save_path, bg_addr, scale, position_x, position_y)
+            # matting_edit_bg.generate(mask_path, img_path, save_path)
+            matting_edit_bg.generate(mask_path, img_path, save_path, bg_path, scale=scale, x=position_x, y=position_y)
         except AttributeError:
             return jsonify(data= {"message": "Input pictures failure. "}, code=1)
+        except cv2.error as err:
+            print(err)
+            return jsonify(data= {"message": "cv2 failure. "}, code=1)
         except:
-            return jsonify(data= {"message": "Generate failure. "}, code=1)
+            return jsonify(data= {"message": "runtime failure. "}, code=1)
 
     return jsonify(data= {"path": save_path}, code=0)
 

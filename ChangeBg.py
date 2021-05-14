@@ -20,7 +20,9 @@ class ChangeBg:
         fg = np.multiply(mask_alpha, img_alpha).astype('uint8')
 
         if bg_addr:
-            self.change_bg(bg_addr, fg, mask, x, y)
+            result = self.change_bg(bg_addr, fg, mask, x, y)
+            self.save(result, save_path)
+
         elif bg_color:
             self.change_color(bg_color, fg, mask)
         else:
@@ -28,8 +30,7 @@ class ChangeBg:
 
     def change_bg(self, bg_addr, fg, mask, x, y):
         bg = cv2.imread(bg_addr)
-        result = self.move(fg, bg, mask, x, y)
-        self.save(result, save_path)
+        return self.move(fg, bg, mask, x, y)
 
     def change_color(self, bg_color, fg, mask):
         r, g, b = bg_color
@@ -77,12 +78,12 @@ if __name__ == '__main__':
     bg_path = "bg.png"
     save_path = "save3.jpg"
     scale = 0.5
-    x, y = (0, 0)  # x y
+    x, y = (100, 200)  # x y
 
     start = time.time()
 
     img_set = ChangeBg()
-    img_set.generate(mask_path, img_path, save_path, bg_path, scale, x, y)
+    img_set.generate(mask_path, img_path, save_path, bg_path, scale=scale, x=x, y=y)
     img_set.generate(mask_path, img_path, save_path)
 
     end = time.time()
