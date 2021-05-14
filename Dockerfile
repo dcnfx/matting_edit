@@ -5,7 +5,7 @@ RUN apt-get update --fix-missing && \
             libopencv-core-dev \
             libgl1-mesa-glx
 ADD requirements.txt /
-RUN pip install --no-cache-dir --upgrade -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple  --timeout 600
+RUN pip install --no-cache-dir --upgrade -r requirements.txt  --timeout 600
 
 ADD . /app
 WORKDIR /app
