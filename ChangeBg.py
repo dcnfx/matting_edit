@@ -7,7 +7,7 @@ class ChangeBg:
     def __init__(self):
         pass
 
-    def generate(self, mask_addr, img_addr, save_path, bg_addr=None, scale=1., x=0, y=0):
+    def generate(self, mask_addr, img_addr, save_path, bg_addr=None, bg_color=None, scale=1., x=0, y=0):
         mask = cv2.imread(mask_addr, 0)
         img = cv2.imread(img_addr)
 
@@ -20,11 +20,25 @@ class ChangeBg:
         fg = np.multiply(mask_alpha, img_alpha).astype('uint8')
 
         if bg_addr:
-            bg = cv2.imread(bg_addr)
-            result = self.move(fg, bg, mask, x, y)
-            self.save(result, save_path)
+            self.change_bg(bg_addr, fg, mask, x, y)
+        elif bg_color:
+            self.change_color(bg_color, fg, mask)
         else:
             self.save(fg, save_path, mask=mask)
+
+    def change_bg(self, bg_addr, fg, mask, x, y):
+        bg = cv2.imread(bg_addr)
+        result = self.move(fg, bg, mask, x, y)
+        self.save(result, save_path)
+
+    def change_color(self, bg_color, fg, mask):
+        r, g, b = bg_color
+        r = np.zeros(mask.shape) + r
+        g = np.zeros(mask.shape) + g
+        b = np.zeros(mask.shape) + b
+
+        bg = cv2.merge((b, g, r))
+
 
     def move(self, fg, bg, mask, x, y):
         h_fg, w_fg, _ = fg.shape
@@ -61,7 +75,7 @@ if __name__ == '__main__':
     img_path = "test_img.jpg"
     mask_path = "test_mask.jpg"
     bg_path = "bg.png"
-    save_path = "save3.png"
+    save_path = "save3.jpg"
     scale = 0.5
     x, y = (0, 0)  # x y
 
