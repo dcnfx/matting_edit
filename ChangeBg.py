@@ -11,6 +11,11 @@ class ChangeBg:
         mask = cv2.imread(mask_addr, 0)
         img = cv2.imread(img_addr)
 
+        try:
+            _, _ = mask.shape, img.shape
+        except AttributeError:
+            print("mask/img cannot be read")
+
         if scale != 1.:
             img = cv2.resize(img, (int(img.shape[1] * scale), int(img.shape[0] * scale)))
             mask = cv2.resize(mask, (int(mask.shape[1] * scale), int(mask.shape[0] * scale)))
@@ -30,6 +35,10 @@ class ChangeBg:
 
     def change_bg(self, bg_addr, fg, mask, x, y):
         bg = cv2.imread(bg_addr)
+        try:
+            _ = bg.shape
+        except AttributeError:
+            print("bg cannot be read")
         return self.move(fg, bg, mask, x, y)
 
     def change_color(self, bg_color, fg, mask):
@@ -68,23 +77,29 @@ class ChangeBg:
             result[:, :, 3] = mask
         else:
             result = img
-
-        cv2.imwrite(save_path, result)
+        write_status = cv2.imwrite(save_path, result)
+        if write_status is not True:
+            print("img save error")
+            raise OSError
 
 
 if __name__ == '__main__':
-    img_path = "test_img.jpg"
-    mask_path = "test_mask.jpg"
-    bg_path = "bg.png"
-    save_path = "save3.jpg"
-    scale = 0.5
-    x, y = (100, 200)  # x y
+    img_path = "view.png"
+    mask_path = "view.png"
+    bg_path = "wallhaven-rd3xvm.jpg"
+    save_path = "save4.jpg"
+    scale = 4.43
+    x, y = (22, -6)  # x y
+
+    # fg = cv2.imread(img_path)
+    # empty_mask = np.ones(fg.shape, dtype=np.uint8)
+    # cv2.imwrite(mask_path, empty_mask)
 
     start = time.time()
 
     img_set = ChangeBg()
     img_set.generate(mask_path, img_path, save_path, bg_path, scale=scale, x=x, y=y)
-    img_set.generate(mask_path, img_path, save_path)
+    # img_set.generate(mask_path, img_path, save_path)
 
     end = time.time()
     print(end - start)

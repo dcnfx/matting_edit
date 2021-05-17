@@ -1,5 +1,6 @@
 *.png
 *.jpg
+*.webp
 
 /.idea/
 /__pycache__/
