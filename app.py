@@ -45,11 +45,18 @@ def fusion_bg():
             return jsonify(data={"message": "img, mask size unmatch"}, code=1)
         except OSError:
             return jsonify(data= {"message": "save failure "}, code=1)
+
     elif request.form["mode"] == "change":
         bg_path = request.form["bg_path"]
         scale = float(request.form["scale"])
         position_x = int(float(request.form["position_x"]))
         position_y = int(float(request.form["position_y"]))
+        blur_coeff = 0
+
+        try:
+            blur_coeff = int(float(request.form["blur_coeff"]))
+        except:
+            print("no blur_coeff or invalid")
 
         print("\tbg_path: ", bg_path)
         print("\tscale: ", scale)
@@ -57,7 +64,12 @@ def fusion_bg():
         print("\tposition_y: ", position_y)
 
         try:
-            matting_edit_bg.generate(mask_path, img_path, save_path, bg_path, scale=scale, x=position_x, y=position_y)
+            if blur_coeff != 0:
+                matting_edit_bg.generate(mask_path, img_path, save_path, bg_addr=bg_path, scale=scale, x=position_x,
+                                         y=position_y, blur_coeff=blur_coeff)
+            else:
+                matting_edit_bg.generate(mask_path, img_path, save_path, bg_addr=bg_path, scale=scale, x=position_x,
+                                         y=position_y)
         except AttributeError:
             return jsonify(data={"message": "Input pictures failure. "}, code=1)
         except cv2.error as err:
@@ -68,6 +80,7 @@ def fusion_bg():
             return jsonify(data={"message": "img, mask size unmatch"}, code=1)
         except OSError:
             return jsonify(data={"message": "save failure "}, code=1)
+
     elif request.form["mode"] == "change_bg":
         bg_color = request.form["bg_color"]
         try:
