@@ -7,6 +7,7 @@ from flask import Flask, request, render_template, jsonify
 import requests
 from gevent.pywsgi import WSGIServer
 import numpy as np
+import sentry_sdk
 from ChangeBg import ChangeBg
 
 # Declare a flask app
@@ -15,16 +16,10 @@ app = Flask(__name__)
 matting_edit_bg = ChangeBg()
 
 
-
-
 @app.route('/', methods=['GET'])
 def index():
     # Main page
     return render_template('index.html')
-
-@app.route("/test", methods=['POST'])
-def test_request():
-    return jsonify(data= {"message": request.form["img_path"]}, code=1)
 
 @app.route('/', methods=['POST'])
 def fusion_bg():
@@ -62,7 +57,6 @@ def fusion_bg():
         print("\tposition_y: ", position_y)
 
         try:
-            # matting_edit_bg.generate(mask_path, img_path, save_path)
             matting_edit_bg.generate(mask_path, img_path, save_path, bg_path, scale=scale, x=position_x, y=position_y)
         except AttributeError:
             return jsonify(data={"message": "Input pictures failure. "}, code=1)
@@ -74,13 +68,26 @@ def fusion_bg():
             return jsonify(data={"message": "img, mask size unmatch"}, code=1)
         except OSError:
             return jsonify(data={"message": "save failure "}, code=1)
+    elif request.form["mode"] == "change_bg":
+        bg_color = request.form["bg_color"]
+        try:
+            matting_edit_bg.generate(mask_path, img_path, save_path, bg_color)
+        except AttributeError:
+            return jsonify(data={"message": "Input pictures failure. "}, code=1)
+        except ValueError:
+            print("img, mask size unmatch")
+            return jsonify(data={"message": "img, mask size unmatch"}, code=1)
+        except OSError:
+            return jsonify(data={"message": "save failure "}, code=1)
 
     return jsonify(data= {"path": save_path}, code=0)
 
 
 if __name__ == '__main__':
     # app.run(port=5002, threaded=False)
+    sentry_sdk.init("http://3a06f4e9985c453f83c448479309c91b@192.168.50.13:9900/3")
 
     # Serve the app with gevent
     http_server = WSGIServer(('0.0.0.0', 5000), app)
     http_server.serve_forever()
+

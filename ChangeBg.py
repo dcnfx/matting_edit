@@ -1,13 +1,14 @@
 import cv2
 import numpy as np
 import time
+import sentry_sdk
 
 
 class ChangeBg:
     def __init__(self):
-        pass
+        self.blur_scale = 1.2
 
-    def generate(self, mask_addr, img_addr, save_path, bg_addr=None, bg_color=None, scale=1., x=0, y=0):
+    def generate(self, mask_addr, img_addr, save_path, blur_coeff=None, bg_addr=None, bg_color=None, scale=1., x=0, y=0):
         mask = cv2.imread(mask_addr, 0)
         img = cv2.imread(img_addr)
 
@@ -25,29 +26,36 @@ class ChangeBg:
         fg = np.multiply(mask_alpha, img_alpha).astype('uint8')
 
         if bg_addr:
-            result = self.change_bg(bg_addr, fg, mask, x, y)
-            self.save(result, save_path)
+            bg = cv2.imread(bg_addr)
+            try:
+                _ = bg.shape
+            except AttributeError:
+                print("bg cannot be read")
 
+            if blur_coeff is not None:
+                bg = self.blur(bg, blur_coeff)
+
+            result = self.move(fg, bg, mask, x, y)
+            self.save(result, save_path)
         elif bg_color:
-            self.change_color(bg_color, fg, mask)
+            bg = self.change_color(bg_color, mask)
+            result = np.add(bg, fg)
+            self.save(result, save_path)
         else:
             self.save(fg, save_path, mask=mask)
 
-    def change_bg(self, bg_addr, fg, mask, x, y):
-        bg = cv2.imread(bg_addr)
-        try:
-            _ = bg.shape
-        except AttributeError:
-            print("bg cannot be read")
-        return self.move(fg, bg, mask, x, y)
+    def blur(self, bg, blur_coeff):
+        blur_coeff = (blur_coeff, blur_coeff)
+        return cv2.blur(bg, blur_coeff)
 
-    def change_color(self, bg_color, fg, mask):
-        r, g, b = bg_color
+    def change_color(self, bg_color, mask):
+        r, g, b = self.hex_to_rgb(bg_color)
         r = np.zeros(mask.shape) + r
         g = np.zeros(mask.shape) + g
         b = np.zeros(mask.shape) + b
 
         bg = cv2.merge((b, g, r))
+        return self.bg_blending(mask, bg)
 
 
     def move(self, fg, bg, mask, x, y):
@@ -65,7 +73,7 @@ class ChangeBg:
         crop_fg = fg[y1_fg:y2_fg, x1_fg:x2_fg, :]
         crop_mask = mask[y1_fg:y2_fg, x1_fg:x2_fg]
 
-        patch = np.multiply(1. - np.expand_dims(crop_mask.astype(float) / 255, 2), crop_bg).astype('uint8')
+        patch = self.bg_blending(crop_mask, crop_bg)
         patch = np.add(patch, crop_fg)
         result = bg
         result[y1_global:y2_global, x1_global:x2_global, :] = patch
@@ -82,24 +90,35 @@ class ChangeBg:
             print("img save error")
             raise OSError
 
+    def bg_blending(self, mask, bg):
+        return np.multiply(1. - np.expand_dims(mask.astype(float) / 255, 2), bg).astype('uint8')
+
+    def hex_to_rgb(self, value):
+        value = value.lstrip('#')
+        lv = len(value)
+        return tuple(int(value[i:i + lv // 3], 16) for i in range(0, lv, lv // 3))
+
 
 if __name__ == '__main__':
-    img_path = "view.png"
-    mask_path = "view.png"
+    img_path = "test_img.jpg"
+    mask_path = "test_mask.jpg"
     bg_path = "wallhaven-rd3xvm.jpg"
     save_path = "save4.jpg"
-    scale = 4.43
+    scale = 0.3
     x, y = (22, -6)  # x y
+    bg_color = "#ffaaff"
+    blur_coeff = 50
 
-    # fg = cv2.imread(img_path)
-    # empty_mask = np.ones(fg.shape, dtype=np.uint8)
-    # cv2.imwrite(mask_path, empty_mask)
+    sentry_sdk.init("http://3a06f4e9985c453f83c448479309c91b@192.168.50.13:9900/3")
 
     start = time.time()
 
     img_set = ChangeBg()
-    img_set.generate(mask_path, img_path, save_path, bg_path, scale=scale, x=x, y=y)
+    # img_set.generate(mask_path, img_path, save_path, bg_path, scale=scale, x=x, y=y)
     # img_set.generate(mask_path, img_path, save_path)
+    # img_set.generate(mask_path, img_path, save_path, bg_color=bg_color)
+    img_set.generate(mask_path, img_path, save_path, bg_addr=bg_path, scale=scale, x=x, y=y, blur_coeff=blur_coeff)
+
 
     end = time.time()
     print(end - start)
