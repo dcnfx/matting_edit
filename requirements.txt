@@ -6,3 +6,4 @@ Pillow
 opencv-python
 requests
 Werkzeug
+sentry_sdk

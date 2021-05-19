@@ -45,6 +45,11 @@ class ChangeBg:
             self.save(fg, save_path, mask=mask)
 
     def blur(self, bg, blur_coeff):
+        # h_new, w_new = (int(bg.shape[0] * self.blur_scale), int(bg.shape[1] * self.blur_scale))
+        # h_extra, w_extra = (h_new - bg.shape[0]) // 2, (w_new - bg.shape[1]) // 2
+        # bg = cv2.resize(bg, (w_new, h_new))
+        # bg = bg[h_extra:bg.shape[0]+h_extra, w_extra:bg.shape[1]+w_extra, :]
+
         blur_coeff = (blur_coeff, blur_coeff)
         return cv2.blur(bg, blur_coeff)
 
@@ -56,7 +61,6 @@ class ChangeBg:
 
         bg = cv2.merge((b, g, r))
         return self.bg_blending(mask, bg)
-
 
     def move(self, fg, bg, mask, x, y):
         h_fg, w_fg, _ = fg.shape
@@ -103,13 +107,13 @@ if __name__ == '__main__':
     img_path = "test_img.jpg"
     mask_path = "test_mask.jpg"
     bg_path = "wallhaven-rd3xvm.jpg"
-    save_path = "save4.jpg"
-    scale = 0.3
+    save_path = "save5.png"
+    scale = 0.4
     x, y = (22, -6)  # x y
     bg_color = "#ffaaff"
-    blur_coeff = 50
+    blur_coeff = 10
 
-    sentry_sdk.init("http://3a06f4e9985c453f83c448479309c91b@192.168.50.13:9900/3")
+    # sentry_sdk.init("http://3a06f4e9985c453f83c448479309c91b@192.168.50.13:9900/3")
 
     start = time.time()
 
