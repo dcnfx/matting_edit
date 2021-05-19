@@ -80,23 +80,17 @@ def fusion_bg():
             return jsonify(data={"message": "change color error"}, code=1)
 
     elif request.form["mode"] == "change_bg" or request.form['mode'] == "change":  ## transient
-        blur_coeff = 0
-
         bg_path = request.form["bg_path"]
         scale = float(request.form["scale"])
         position_x = int(float(request.form["position_x"]))
         position_y = int(float(request.form["position_y"]))
+        blur_coeff = int(float(request.form["blur_coeff"]))
 
         print("\tbg_path: ", bg_path)
         print("\tscale: ", scale)
         print("\tposition_x: ", position_x)
         print("\tposition_y: ", position_y)
-
-        try:
-            blur_coeff = int(float(request.form["blur_coeff"]))
-            print("\tblur_coeff: ", blur_coeff)
-        except:
-            print("\tno blur_coeff or invalid")
+        print("\tblur_coeff: ", blur_coeff)
 
         try:
             if blur_coeff != 0:

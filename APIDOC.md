@@ -46,7 +46,7 @@
 | scale | float | &#9745; | scale of the foreground compare to original foreground size. |
 | position_x | int | &#9745; | x position of upper-left corner of the foreground image (upper-left corner of the background as global original) |
 | position_y | int | &#9745; | y position of upper-left corner of the foreground image (upper-left corner of the background as global original) |
-| blur_corff | int | &#9744; | value > 0 as the blur coefficient. Do NOT pass it if no blur required |
+| blur_coeff | int | &#9744; | value > 0 as the blur coefficient. Do NOT pass it if no blur required |
 
 **Returned:** json of the saving address of integrated RGBA image.
 ```angular2html
