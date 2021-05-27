@@ -3,10 +3,9 @@ import os
 
 # Flask
 import cv2
+import datetime
 from flask import Flask, request, render_template, jsonify
-import requests
 from gevent.pywsgi import WSGIServer
-import numpy as np
 import sentry_sdk
 from ChangeBg import ChangeBg
 
@@ -42,10 +41,9 @@ def fusion_bg():
     mask_path = request.form["mask_path"]
     save_path = request.form["save_path"]
 
+    print(datetime.datetime.now())
     print("Input: ")
-    print("\timg_path: ", img_path)
-    print("\tmask_path: ", mask_path)
-    print("\tsave_path: ", save_path)
+    print(request.form)
 
     if request.form["mode"] == "fusion":
         try:
@@ -79,18 +77,12 @@ def fusion_bg():
         except:
             return jsonify(data={"message": "change color error"}, code=1)
 
-    elif request.form["mode"] == "change_bg" or request.form['mode'] == "change":  ## transient
+    elif request.form["mode"] == "change_bg":
         bg_path = request.form["bg_path"]
         scale = float(request.form["scale"])
         position_x = int(float(request.form["position_x"]))
         position_y = int(float(request.form["position_y"]))
         blur_coeff = int(float(request.form["blur_coeff"]))
-
-        print("\tbg_path: ", bg_path)
-        print("\tscale: ", scale)
-        print("\tposition_x: ", position_x)
-        print("\tposition_y: ", position_y)
-        print("\tblur_coeff: ", blur_coeff)
 
         try:
             if blur_coeff != 0:
